@@ -1,0 +1,9 @@
+{
+  "river": "Guadalupe River",
+  "reach": "Main Stem",
+  "cross_sections": 158,
+  "manning_n": {
+    "channel": 0.032,
+    "overbank": 0.085
+  }
+}

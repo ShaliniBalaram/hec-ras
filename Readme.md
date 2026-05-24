@@ -4,6 +4,13 @@ Python utilities for a Guadalupe River flood-analysis workflow using public USGS
 
 The repository is centered on the Victoria, Texas reach of the Guadalupe River and the Hurricane Harvey period in August-September 2017. It is intended as a practical hydrology and hydraulic-modeling support project: download observations, prepare HEC-RAS-style inputs, run available HEC-RAS controller operations on Windows, and create validation, calibration, frequency-analysis, and event-summary outputs.
 
+## Skills Demonstrated
+
+- USGS/NOAA hydrologic data collection and caching
+- HEC-RAS controller integration checks for Windows workflows
+- Flood-frequency analysis and event-based reporting
+- Clear separation between live HEC-RAS execution and reviewable simulation-mode outputs
+
 ## What This Repository Does
 
 - Downloads USGS streamflow, stage, peak-flow, and rating data for Guadalupe River gauges.

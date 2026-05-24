@@ -1,0 +1,11 @@
+numpy
+pandas
+scipy
+geopandas
+rasterio
+matplotlib
+seaborn
+folium
+plotly
+requests
+pywin32; platform_system == "Windows"

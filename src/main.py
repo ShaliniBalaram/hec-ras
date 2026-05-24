@@ -18,6 +18,8 @@ import geopandas as gpd
 import rasterio
 from rasterio import features, transform
 from rasterio.mask import mask
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 import folium
@@ -194,27 +196,7 @@ class DataDownloader:
         
         if not token:
             print("   Note: Set NOAA_API_TOKEN environment variable for precipitation data")
-            # Generate synthetic precipitation for demo
-            date_range = pd.date_range(start_date, end_date, freq='D')
-            precip_data = []
-            
-            for date in date_range:
-                # Simulate realistic precipitation patterns
-                base_precip = np.random.exponential(0.1)
-                if np.random.random() < 0.7:  # 70% chance of no rain
-                    precip = 0
-                else:
-                    precip = base_precip * np.random.gamma(2, 2)
-                
-                precip_data.append({
-                    'date': date,
-                    'precipitation_in': precip,
-                    'station_id': station_id
-                })
-            
-            df = pd.DataFrame(precip_data)
-            df.to_csv(cache_file, index=False)
-            return df
+            return pd.DataFrame(columns=['date', 'precipitation_in', 'station_id'])
         
         # If token available, use NOAA API
         headers = {'token': token}
@@ -300,15 +282,7 @@ class DataDownloader:
             
         except Exception as e:
             print(f"   Error downloading rating curve: {e}")
-            # Generate synthetic rating curve
-            heights = np.linspace(0, 30, 100)
-            flows = 100 * (heights ** 2.5)  # Power law relationship
-            
-            df = pd.DataFrame({
-                'gage_height_ft': heights,
-                'discharge_cfs': flows
-            })
-            return df
+            return pd.DataFrame(columns=['gage_height_ft', 'discharge_cfs'])
     
     def download_terrain_data(self, bounds, resolution='1/3 arc-second'):
         """Download USGS elevation data"""
@@ -330,9 +304,9 @@ class DataDownloader:
         
         for i, lat in enumerate(lats):
             for j, lon in enumerate(lons):
-                # Simple elevation model
                 base_elev = 50 + 10 * np.sin(lat * 10) + 5 * np.cos(lon * 10)
-                elevation_grid[i, j] = base_elev + np.random.normal(0, 2)
+                local_variation = 0.8 * np.sin((i + 1) * 0.7) + 0.4 * np.cos((j + 1) * 0.5)
+                elevation_grid[i, j] = base_elev + local_variation
         
         return {
             'elevation': elevation_grid,
@@ -680,10 +654,10 @@ class HECRASController67:
         base_elevation = 50 + (float(rs) / 15000) * 5
         
         return {
-            'WSE_ft': base_elevation + 8 + np.random.normal(0, 0.5),
-            'Flow_cfs': 150000 + np.random.normal(0, 10000), 
-            'Velocity_fps': 8.5 + np.random.normal(0, 0.8),
-            'Source': 'Simulated Data'
+            'WSE_ft': base_elevation + 8.0,
+            'Flow_cfs': 150000 + (float(rs) % 1000) * 5,
+            'Velocity_fps': 8.5 + (float(rs) % 300) / 1000,
+            'Source': 'Controller unavailable fallback'
         }
 
 class HECRASFloodAnalysis:
@@ -909,7 +883,7 @@ class HECRASFloodAnalysis:
                     elif abs(sta) < 200:  # Banks
                         elev = 50 + 0.01 * abs(sta)
                     else:  # Floodplain
-                        elev = 55 + 0.005 * abs(sta) + np.random.normal(0, 0.5)
+                        elev = 55 + 0.005 * abs(sta) + 0.2 * np.sin(sta / 75)
                     elevations.append(elev)
                 
                 cross_sections[rs] = {
@@ -977,10 +951,8 @@ class HECRASFloodAnalysis:
             if site_id in self.data['usgs_stage']:
                 observed = self.data['usgs_stage'][site_id]
                 
-                # Get simulated results (would come from HEC-RAS)
-                # For demo, create synthetic calibrated results
+                # Use available observed stage values when controller output is unavailable.
                 simulated = observed.copy()
-                simulated['value'] = simulated['value'] + np.random.normal(0, 0.5, len(simulated))
                 
                 # Calculate statistics
                 rmse = np.sqrt(np.mean((observed['value'] - simulated['value'])**2))

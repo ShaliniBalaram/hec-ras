@@ -12,7 +12,7 @@
 ### Python Package Dependencies
 Install the following dependencies using pip:
 ```bash
-pip install pywin32 numpy pandas geopandas matplotlib seaborn folium plotly rasterio requests
+pip install -r requirements.txt
 ```
 
 ### Configuration Requirements
@@ -40,7 +40,7 @@ pip install pywin32 numpy pandas geopandas matplotlib seaborn folium plotly rast
    - Open Command Prompt or PowerShell
    - Run the following command:
    ```bash
-   pip install pywin32 numpy pandas geopandas matplotlib seaborn folium plotly rasterio requests
+   pip install -r requirements.txt
    ```
 
 5. **Verify COM Interface**
